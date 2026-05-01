@@ -19,7 +19,7 @@ pipeline {
             steps {
                 echo 'Executing the application...'
                 // Using the Maven Exec plugin to run the main class
-                sh 'mvn exec:java -Dexec.mainClass="com.example.App"'
+                sh 'mvn exec:java -Dexec.mainClass="HelloWorld"'
             }
         }
     }
