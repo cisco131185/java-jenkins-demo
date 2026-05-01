@@ -1,29 +1,49 @@
 pipeline {
-    agent any
+	agent any
 
-    stages {
-        stage('Compile') {
-            steps {
-                echo 'Compiling the Java application...'
-      
-                sh 'javac HelloWorld.java'
-            }
-        }
+	stages {
 
-        stage('Run & Verify') {
-            steps {
-                echo 'Executing the application...'
-		sh 'java HelloWorld'
-            }
-        }
-    }
+		stage('Clone Repo') {
+			steps {
+				git 'https://github.com/cisco131185/java-jenkins-demo.git'
+			}
+		}
 
-    post {
-        success {
-            echo 'Pipeline completed successfully!'
-        }
-        failure {
-            echo 'Pipeline failed. Check the console output above for errors.'
-        }
-    }
+		stage('Build Docker Image') {
+			steps {
+				echo 'Building Docker Image...'
+				sh 'docker build -t java-app .'
+			}
+		}
+
+		stage('Remove Old Container') {
+			steps {
+				echo 'Removing old container if exists...'
+				sh 'docker rm -f java-container || true'
+			}
+		}
+
+		stage('Run Docker Container') {
+			steps {
+				echo 'Running Docker container...'
+				sh 'docker run --name java-container java-app'
+			}
+		}
+
+		stage('Verify Output') {
+			steps {
+				echo 'Checking container logs...'
+				sh 'docker logs java-container'
+			}
+		}
+	}
+
+	post {
+		success {
+			echo 'Pipeline completed successfully!'
+		}
+		failure {
+			echo 'Pipeline failed. Check logs.'
+		}
+	}
 }
