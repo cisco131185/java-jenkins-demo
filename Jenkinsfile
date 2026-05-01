@@ -16,7 +16,7 @@ pipeline {
             }
         }
 
-https://github.com/cisco131185/java-jenkins-demo.git        stage('Run & Verify') {
+        stage('Run & Verify') {
             steps {
                 // Executes the Java application
                 // Note: exec.mainClass points to your App.java
@@ -25,4 +25,3 @@ https://github.com/cisco131185/java-jenkins-demo.git        stage('Run & Verify'
         }
     }
 }
-
