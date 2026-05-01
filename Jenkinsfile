@@ -1,27 +1,35 @@
 pipeline {
     agent any
 
-    stages {
-        stage('Checkout') {
-            steps {
-                // Pulls the code from your GitHub repo
-                checkout scm
-            }
-        }
+    tools {
+        // This must match the 'Name' you gave Maven in Manage Jenkins -> Tools
+        maven 'maven_3' 
+    }
 
+    stages {
         stage('Compile') {
             steps {
-                // Compiles the code using Maven
+                echo 'Compiling the Java application...'
+                // Clean removes old build files, compile generates the .class files
                 sh 'mvn clean compile'
             }
         }
 
         stage('Run & Verify') {
             steps {
-                // Executes the Java application
-                // Note: exec.mainClass points to your App.java
-                sh 'mvn exec:java -Dexec.mainClass="HelloWorld"'
+                echo 'Executing the application...'
+                // Using the Maven Exec plugin to run the main class
+                sh 'mvn exec:java -Dexec.mainClass="com.example.App"'
             }
+        }
+    }
+
+    post {
+        success {
+            echo 'Pipeline completed successfully!'
+        }
+        failure {
+            echo 'Pipeline failed. Check the console output above for errors.'
         }
     }
 }
