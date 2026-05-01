@@ -20,7 +20,7 @@ pipeline {
             steps {
                 // Executes the Java application
                 // Note: exec.mainClass points to your App.java
-                sh 'mvn exec:java -Dexec.mainClass="com.example.App"'
+                sh 'mvn exec:java -Dexec.mainClass="HelloWorld"'
             }
         }
     }
