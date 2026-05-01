@@ -1,5 +1,9 @@
 pipeline {
 	agent any
+	
+	environment {
+		DOCKER_IMAGE = 'ditiss131185/java-app'
+	}
 
 	stages {
 
@@ -15,32 +19,31 @@ pipeline {
 				sh 'docker build -t java-app .'
 			}
 		}
-
-		stage('Remove Old Container') {
+		
+		stage('tag image') {
 			steps {
-				echo 'Removing old container if exists...'
-				sh 'docker rm -f java-container || true'
+				sh 'docker tag java-app $DOCKER_IMAGE:latest'
+			}
+		}
+		
+		stage('login to dockerhub') {
+			steps {
+				withCredentials([usernamePassword(credentialsId: 'dockerhub-cred', usernameVariable: 'USER', passwordVariable: 'PASS'))
+				sh 'echo $PASS | docker login -u $USER --password-stdin'
+			}
+		}	
+
+		stage('push image') {
+			steps {
+				sh 'docker push $DOCKER_IMAGE:latest'
 			}
 		}
 
-		stage('Run Docker Container') {
-			steps {
-				echo 'Running Docker container...'
-				sh 'docker run --name java-container java-app'
-			}
-		}
-
-		stage('Verify Output') {
-			steps {
-				echo 'Checking container logs...'
-				sh 'docker logs java-container'
-			}
-		}
 	}
 
 	post {
 		success {
-			echo 'Pipeline completed successfully!'
+			echo 'docker image pushed successfully!'
 		}
 		failure {
 			echo 'Pipeline failed. Check logs.'
